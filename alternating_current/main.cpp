@@ -1,17 +1,15 @@
 #include <QCoreApplication>
-
-int sum(int a, int b)
-{
-    int c = a + b;
-    return c;
-}
+#include <functions.h>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
 
+#ifdef TEST_MODE
+    runTests(argc, argv);
+#else
+    //Основные действия программы
+    int res = sum(1, 2);
+#endif
 
-
-
-    return a.exec();
+    return 0;
 }

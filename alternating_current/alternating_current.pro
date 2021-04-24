@@ -1,4 +1,3 @@
 include (alternating_current.pri)
 
-SOURCES += \
-        main.cpp
+SOURCES += main.cpp

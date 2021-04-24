@@ -1,3 +1,4 @@
+include(../alternating_current/alternating_current.pri)
 QT += testlib
 QT -= gui
 
