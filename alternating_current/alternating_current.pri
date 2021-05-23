@@ -22,6 +22,7 @@ SOURCES += \
 HEADERS += \
     $$PWD/../../tinyxml/tinystr.h \
     $$PWD/../../tinyxml/tinyxml.h \
+    $$PWD/element.h \
     $$PWD/functions.h
 
 INCLUDEPATH = \
