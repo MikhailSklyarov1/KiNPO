@@ -17,6 +17,7 @@ SOURCES += \
     $$PWD/../../tinyxml/tinyxml.cpp \
     $$PWD/../../tinyxml/tinyxmlerror.cpp \
     $$PWD/../../tinyxml/tinyxmlparser.cpp \
+    $$PWD/branch.cpp \
     $$PWD/functions.cpp
 
 HEADERS += \
