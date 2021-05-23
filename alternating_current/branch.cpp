@@ -33,7 +33,34 @@ Branch::~Branch()
 
 }
 
+ComplexVal Branch::calcResistanceBranch(const QVector<Element>& elements)
+{
+    double activ = 0;
+    double reactiv = 0;
 
+    //Для каждого элемента вектора
+    for(int i = 0; i < elements.size(); i++)
+    {
+        //Если резистор
+        if(elements[i].type == RESISTOR)
+        {
+            activ+=elements[i].value;
+        }
+
+        //Иначе если индуктивный элемент
+        else if(elements[i].type == INDUCTOR)
+        {
+            reactiv+= 2 * M_PI * FREQUENCY * elements[i].value;
+        }
+
+        //Иначе если конденсатор
+        else if(elements[i].type == CAPACITOR)
+        {
+            reactiv-= 1/(2 * M_PI * FREQUENCY * elements[i].value);
+        }
+    }
+    return ComplexVal(activ, reactiv);
+}
 
 const ComplexVal & Branch::getComplexResistance()
 {

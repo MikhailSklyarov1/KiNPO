@@ -87,7 +87,11 @@ private:
     double current;
     double voltage;
 
-
+    /*! Рассчитывает комплексное сопротивление на ветви
+        \param[in] elements - список элементов, принадлежащих ветви
+        \return - компексное значение сопротивления
+    */
+    ComplexVal calcResistanceBranch(const QVector<Element>& elements);
 
 };
 
