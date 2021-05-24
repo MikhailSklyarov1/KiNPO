@@ -26,7 +26,8 @@ HEADERS += \
     $$PWD/branch.h \
     $$PWD/element.h \
     $$PWD/enum.h \
-    $$PWD/functions.h
+    $$PWD/functions.h \
+    $$PWD/graph.h
 
 INCLUDEPATH = \
     $$PWD/.
