@@ -18,7 +18,8 @@ SOURCES += \
     $$PWD/../../tinyxml/tinyxmlerror.cpp \
     $$PWD/../../tinyxml/tinyxmlparser.cpp \
     $$PWD/branch.cpp \
-    $$PWD/functions.cpp
+    $$PWD/functions.cpp \
+    $$PWD/graph.cpp
 
 HEADERS += \
     $$PWD/../../tinyxml/tinystr.h \
