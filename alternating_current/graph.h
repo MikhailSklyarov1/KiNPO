@@ -30,6 +30,14 @@ private:
 
 public:
 
+    /*! Функция ищет путь в графе из узла begin в узел goal
+        \param[in] begin -
+        \param[in] goal -
+        \param[in, out] path -
+        \param[in, out] visited -
+        \return -
+    */
+
     bool operator==(const Graph & other) const;
     /*! Функция удаляет все ветви графа
     */
