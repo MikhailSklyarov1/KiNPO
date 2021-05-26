@@ -168,6 +168,7 @@ bool Graph::findPath(const QString & begin, const QString & goal,
 }
 
 
+
 bool Graph::operator==(const Graph & other) const
 {
     return this->graph == other.graph;
