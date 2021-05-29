@@ -167,7 +167,45 @@ bool Graph::findPath(const QString & begin, const QString & goal,
     return false;
 }
 
+Link Graph::getLinks(const QString & node) const
+{
+    return graph.value(node);
+}
 
+bool Graph::isSimpleConnected() const
+{
+    QVector<int> path1;
+
+    GraphIterator i(graph);
+    GraphIterator j(graph);
+    while(i.hasNext())
+    {
+        i.next();
+        j = i;
+        while(j.hasNext())
+
+            if(!this->findPath(i.key(), j.next().key(), path1))
+                return false;
+    }
+    return true;
+}
+
+void Graph::findLeafNode(QVector<QString> & list)
+{
+    GraphIterator i(graph);
+    while(i.hasNext())
+        if(i.next().value().count() == 1)
+        {
+            if(i.value().first()!=i.key())
+            {
+                list.append(i.key());
+            }
+        }
+        else if(i.next().value().count() == 0)
+        {
+            list.append(i.key());
+        }
+}
 
 bool Graph::operator==(const Graph & other) const
 {
