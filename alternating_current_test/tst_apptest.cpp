@@ -670,6 +670,86 @@ void AppTest::test_findPath_data()
 }
 
 
+void AppTest::test_calculateResistance()
+{
+    Branch branch;
+    QFETCH(QVector<Element>, param);
+    QFETCH(ComplexVal, expect);
+    ComplexVal res = branch.calcResistanceBranch(param);
+    QVERIFY2((expect.real()-0.1 < res.real() || expect.imag()-0.1 < res.imag()) && (res.real() < expect.real()+0.1 || res.imag() < expect.imag()+0.1), "Result checking failed");
+}
+
+void AppTest::test_calculateResistance_data()
+{
+    setlocale(LC_ALL, "Russian");
+
+    ComplexVal results[7] = {
+        ComplexVal((double)50, 0),
+        ComplexVal(0, (double)40.82),
+        ComplexVal(0, (double)-62.63),
+        ComplexVal(0, (double)107.06),
+        ComplexVal(65, (double)160.14),
+        ComplexVal(65, (double)-0.32),
+        ComplexVal(25, (double)107.06)
+    };
+
+    QVector<Element> test1;
+    QVector<Element> test2;
+    QVector<Element> test3;
+    QVector<Element> test4;
+    QVector<Element> test5;
+    QVector<Element> test6;
+    QVector<Element> test7;
+
+    test1.append(Element(RESISTOR, (double)15.0));
+    test1.append(Element(RESISTOR, (double)20.0));
+    test1.append(Element(RESISTOR, (double)5.0));
+    test1.append(Element(RESISTOR, (double)10.0));
+
+    test2.append(Element(INDUCTOR, (double)0.015));
+    test2.append(Element(INDUCTOR, (double)0.1));
+    test2.append(Element(INDUCTOR, (double)0.01));
+    test2.append(Element(INDUCTOR, (double)0.005));
+
+    test3.append(Element(CAPACITOR, (double)0.00015));
+    test3.append(Element(CAPACITOR, (double)0.0001));
+    test3.append(Element(CAPACITOR, (double)0.001));
+    test3.append(Element(CAPACITOR, (double)0.0005));
+
+    test4.append(Element(CAPACITOR, (double)0.00015));
+    test4.append(Element(CAPACITOR, (double)0.0001));
+    test4.append(Element(INDUCTOR, (double)0.01));
+    test4.append(Element(INDUCTOR, (double)0.5));
+
+    test5.append(Element(RESISTOR, (double)15.0));
+    test5.append(Element(RESISTOR, (double)50.0));
+    test5.append(Element(INDUCTOR, (double)0.01));
+    test5.append(Element(INDUCTOR, (double)0.5));
+
+    test6.append(Element(RESISTOR, (double)15.0));
+    test6.append(Element(RESISTOR, (double)50.0));
+    test6.append(Element(CAPACITOR, (double)0.01));
+    test6.append(Element(CAPACITOR, (double)0.5));
+
+    test7.append(Element(RESISTOR, (double)15.0));
+    test7.append(Element(RESISTOR, (double)10.0));
+    test7.append(Element(CAPACITOR, (double)0.00015));
+    test7.append(Element(CAPACITOR, (double)0.0001));
+    test7.append(Element(INDUCTOR, (double)0.01));
+    test7.append(Element(INDUCTOR, (double)0.5));
+
+    QTest::addColumn<QVector<Element>>("param");
+    QTest::addColumn<ComplexVal>("expect");
+
+    QTest::newRow("Только резисторы") << test1 << results[0];
+    QTest::newRow("Только катушки") << test2 << results[1];
+    QTest::newRow("Только конденсаторы") << test3 <<results[2];
+    QTest::newRow("Катушки и конденсаторы") << test4 << results[3];
+    QTest::newRow("Резисторы и катушки") << test5 << results[4];
+    QTest::newRow("Резисторы и конденсаторы") << test6 << results[5];
+    QTest::newRow("Резисторы, катушки, конденсаторы") << test7 <<results[6];
+}
+
 
 
 
