@@ -30,9 +30,339 @@ public:
 
 private slots:
     void initTestCase();
-
+    void initTestCase();
+    void cleanupTestCase();
+    void test_getSpanningTree();
+    void test_getSpanningTree_data();
     void test_findPath();
     void test_findPath_data();
+
+
+    void test_calculateResistance();
+    void test_calculateResistance_data();
+    void test_cyclicCurrentsCalculation();
+    void test_cyclicCurrentsCalculation_data();
+    void test_currentCalculation();
+    void test_currentCalculation_data();
+    void test_solveEquations();
+    void test_solveEquations_data();
+    void test_findIndependentContours();
+    void test_findIndependentContours_data();
+
+
+private:
+    Branch b;
+    QVector<branchList> b_list1; //списки ветвей для 8 тестовых ситуаций
+    QVector<branchList> b_list2;
+    QVector<contourList> c_list; //списки контуров для 8 тестовых ситуаций
+    QVector<QVector<ComplexVal>> ccurr_list;
+    QMap<int, int> contour;
+
+    void doData();
+};
+
+
+AppTest::AppTest(QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+AppTest::AppTest()
+{
+    b_list1.resize(8);
+    b_list2.resize(7);
+    c_list.resize(8);
+    ccurr_list.resize(8);
+    doData();
+}
+
+AppTest::~AppTest()
+{
+
+}
+
+
+void AppTest::initTestCase()
+{
+
+}
+
+void AppTest::cleanupTestCase()
+{
+
+}
+
+
+template<typename T>
+bool compareVects(const QVector<T> & first, const QVector<T> & second)
+{
+    if(first.count() != second.count())
+        return false;
+    for(int i = 0; i < first.count(); i++)
+        if(!second.contains(first[i]) || second.count(first[i]) != first.count(first[i]))
+            return false;
+    return true;
+}
+
+
+
+
+void AppTest::test_getSpanningTree()
+{
+    Graph t;
+    QVector<int> l;
+
+    QFETCH(Graph, in_graph);
+    QFETCH(Graph, tree);
+    QFETCH(QVector<int>, links);
+
+    in_graph.getSkeletalTree(t, l);
+    bool b = compareVects(l, links);
+    QVERIFY2(t==tree && b, "Result checking failed");
+}
+
+void AppTest::test_getSpanningTree_data()
+{
+    QTest::addColumn<Graph>("in_graph");
+    QTest::addColumn<Graph>("tree");
+    QTest::addColumn<QVector<int>>("links");
+
+    Graph graph;
+    QVector<int> links;
+    Graph exp_graph;
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("b"));
+    graph.insertEdge(QString("a"), 3, QString("b"));
+    graph.insertEdge(QString("a"), 4, QString("b"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+
+    links.append(2);
+    links.append(3);
+    links.append(4);
+
+    QTest::newRow("Все ребра кратные") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("c"));
+    graph.insertEdge(QString("a"), 3, QString("d"));
+    graph.insertEdge(QString("b"), 4, QString("c"));
+    graph.insertEdge(QString("b"), 5, QString("d"));
+    graph.insertEdge(QString("c"), 6, QString("d"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("c"));
+    exp_graph.insertEdge(QString("a"), 3, QString("d"));
+
+    links.append(4);
+    links.append(5);
+    links.append(6);
+
+    QTest::newRow("Граф полный") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString(), 1, QString());
+    exp_graph.insertNode(QString());
+
+    links.append(1);
+
+    QTest::newRow("Граф состоит из одной петли") << graph << exp_graph << links;
+
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+
+    graph.insertEdge(QString(), 1, QString());
+    graph.insertEdge(QString(), 2, QString());
+    graph.insertEdge(QString(), 3, QString());
+
+    exp_graph.insertNode(QString());
+
+    links.append(1);
+    links.append(2);
+    links.append(3);
+
+    QTest::newRow("Граф состоит из несольких петель") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("c"));
+    graph.insertEdge(QString("a"), 3, QString("a"));
+    graph.insertEdge(QString("b"), 4, QString("c"));
+    graph.insertEdge(QString("b"), 5, QString("d"));
+    graph.insertEdge(QString("c"), 6, QString("d"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("c"));
+    exp_graph.insertEdge(QString("b"), 5, QString("d"));
+
+    links.append(3);
+    links.append(4);
+    links.append(6);
+
+    QTest::newRow("Граф содержит петли") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("g"));
+    graph.insertEdge(QString("b"), 3, QString("c"));
+    graph.insertEdge(QString("b"), 4, QString("d"));
+    graph.insertEdge(QString("c"), 5, QString("d"));
+    graph.insertEdge(QString("c"), 6, QString("g"));
+    graph.insertEdge(QString("d"), 7, QString("g"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("g"));
+    exp_graph.insertEdge(QString("b"), 3, QString("c"));
+    exp_graph.insertEdge(QString("b"), 4, QString("d"));
+
+    links.append(5);
+    links.append(6);
+    links.append(7);
+
+    QTest::newRow("Граф простой") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("g"));
+    graph.insertEdge(QString("b"), 3, QString("c"));
+    graph.insertEdge(QString("b"), 4, QString("d"));
+    graph.insertEdge(QString("c"), 5, QString("d"));
+    graph.insertEdge(QString("c"), 6, QString("g"));
+    graph.insertEdge(QString("d"), 7, QString("g"));
+    graph.insertEdge(QString("a"), 8, QString("b"));
+    graph.insertEdge(QString("a"), 9, QString("g"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("g"));
+    exp_graph.insertEdge(QString("b"), 3, QString("c"));
+    exp_graph.insertEdge(QString("b"), 4, QString("d"));
+
+    links.append(5);
+    links.append(6);
+    links.append(7);
+    links.append(8);
+    links.append(9);
+
+    QTest::newRow("Граф содержит кратные ребра") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("g"));
+    graph.insertEdge(QString("b"), 3, QString("c"));
+    graph.insertEdge(QString("b"), 4, QString("d"));
+    graph.insertEdge(QString("c"), 5, QString("d"));
+    graph.insertEdge(QString("c"), 6, QString("g"));
+    graph.insertEdge(QString("d"), 7, QString("g"));
+    graph.insertEdge(QString("a"), 8, QString("b"));
+    graph.insertEdge(QString("a"), 9, QString("g"));
+    graph.insertEdge(QString("c"), 10, QString("c"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("g"));
+    exp_graph.insertEdge(QString("b"), 3, QString("c"));
+    exp_graph.insertEdge(QString("b"), 4, QString("d"));
+
+    links.append(5);
+    links.append(6);
+    links.append(7);
+    links.append(8);
+    links.append(9);
+    links.append(10);
+
+    QTest::newRow("Граф содержит кратные ребра и петли") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("c"));
+    graph.insertEdge(QString("a"), 3, QString("d"));
+    graph.insertEdge(QString("b"), 4, QString("c"));
+    graph.insertEdge(QString("b"), 5, QString("d"));
+    graph.insertEdge(QString("c"), 6, QString("d"));
+    graph.insertEdge(QString("a"), 7, QString("b"));
+    graph.insertEdge(QString("c"), 8, QString("c"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("c"));
+    exp_graph.insertEdge(QString("a"), 3, QString("d"));
+
+    links.append(4);
+    links.append(5);
+    links.append(6);
+    links.append(7);
+    links.append(8);
+
+    QTest::newRow("Полный граф с кратными ребрами и петлями") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+
+    QTest::newRow(" Граф состоит из одного ребра") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+    graph.insertEdge(QString("a"), 1, QString("b"));
+    graph.insertEdge(QString("a"), 2, QString("c"));
+    graph.insertEdge(QString("a"), 3, QString("d"));
+    graph.insertEdge(QString("b"), 4, QString("c"));
+    graph.insertEdge(QString("d"), 5, QString("d"));
+    graph.insertEdge(QString("b"), 6, QString("d"));
+    graph.insertEdge(QString("c"), 7, QString("d"));
+    graph.insertEdge(QString("a"), 8, QString("b"));
+    graph.insertEdge(QString("c"), 9, QString("c"));
+
+    exp_graph.insertEdge(QString("a"), 1, QString("b"));
+    exp_graph.insertEdge(QString("a"), 2, QString("c"));
+    exp_graph.insertEdge(QString("a"), 3, QString("d"));
+
+    links.append(4);
+    links.append(5);
+    links.append(6);
+    links.append(7);
+    links.append(8);
+    links.append(9);
+
+    QTest::newRow("Комплексный тест") << graph << exp_graph << links;
+
+    graph.clear();
+    exp_graph.clear();
+    links.clear();
+
+}
+
 
 
 void AppTest::test_findPath()
