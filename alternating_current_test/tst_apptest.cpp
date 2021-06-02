@@ -1037,6 +1037,46 @@ void AppTest::test_cyclicCurrentsCalculation_data()
 
 }
 
+void AppTest::test_currentCalculation()
+{
+    QFETCH(contourList, contours);
+    QFETCH(branchList, in_branches);
+    QFETCH(branchList, out_branches);
+    QFETCH(QVector<ComplexVal>, currents);
+    currentCalculation(contours, currents, in_branches);
+    bool b = true;
+    QMapIterator<int, Branch> i1(in_branches);
+    QMapIterator<int, Branch> i2(out_branches);
+    while(i1.hasNext() && i2.hasNext())
+    {
+        i1.next();
+        i2.next();
+        double low = i1.value().getCurrent()-0.5;
+        double expect = i2.value().getCurrent();
+        double high = i1.value().getCurrent()+0.5;
+        //допустимая погрешность в ручных расчетах - 0.5
+        if(!(low < expect && expect < high))
+            b = false;
+    }
+    QVERIFY2(b, "Result checking failed");
+}
+
+void AppTest::test_currentCalculation_data()
+{
+    QTest::addColumn<contourList>("contours");
+    QTest::addColumn<branchList>("in_branches");
+    QTest::addColumn<branchList>("out_branches");
+    QTest::addColumn<QVector<ComplexVal>>("currents");
+
+
+    QTest::newRow("В цепи один контур") << c_list[0] << b_list1[0] << b_list2[0] << ccurr_list[0];
+    QTest::newRow("Через каждую ветвь протекает не более двух  контурных токов") << c_list[1] << b_list1[1] << b_list2[1] << ccurr_list[1];
+    QTest::newRow("Цепь содержит ветви, через которые протекает более двух контурных токов")<< c_list[2] << b_list1[2] << b_list2[2] << ccurr_list[2];
+    QTest::newRow("Цепь содержит ветви, через которые протекают все контурные токи") << c_list[3] << b_list1[3] << b_list2[3] << ccurr_list[3];
+    QTest::newRow("Все контурные токи движутся по часовой стрелке") << c_list[4] << b_list1[4] << b_list2[4] << ccurr_list[4];
+    QTest::newRow("Все контура движутся против часовой стрелки") << c_list[5] << b_list1[5] << b_list2[5] << ccurr_list[5];
+    QTest::newRow("Все смежные контура однонаправленны") << c_list[6]<< b_list1[6] << b_list2[6] << ccurr_list[6];
+}
 
 
 
