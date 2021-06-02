@@ -1079,6 +1079,211 @@ void AppTest::test_currentCalculation_data()
 }
 
 
+void AppTest::test_solveEquations()
+{
+    QVector<ComplexVal> r;
+    QFETCH(QVector<QVector<ComplexVal>>, coef);
+    QFETCH(QVector<ComplexVal>, constnum);
+    QFETCH(QVector<ComplexVal>, res);
+
+    solveEquations(coef, constnum, r);
+    bool b = true;
+    for(int i = 0; i < r.count() && r.count() == res.count(); i++)
+    {
+        //допустимая погрешность в ручных расчетах - 0.5
+        if(!((r[i].real()-0.5 < res[i].real() || r[i].imag()-0.5 < res[i].imag()) && (res[i].real() < r[i].real()+0.5 || res[i].imag() < r[i].imag()+0.5)))
+            b = false;
+    }
+    QVERIFY2(compareVects(r, res) || b, "Result checking failed");
+}
+
+void AppTest::test_solveEquations_data()
+{
+    QTest::addColumn<QVector<QVector<ComplexVal> >>("coef");
+    QTest::addColumn<QVector<ComplexVal>>("constnum");
+    QTest::addColumn<QVector<ComplexVal>>("res");
+
+    QVector<QVector<QVector<ComplexVal>>> coef(13);
+    QVector<QVector<ComplexVal>> constnum(13);
+    QVector<ComplexVal> r(4);
+    QVector<QVector<ComplexVal>> res(13);
+
+    for(int i = 1; i < 13; i++)
+    {
+        coef[i].resize(4);
+        for(int j = 0; j < 4; j++)
+            coef[i][j].resize(4);
+    }
+
+
+    coef[0].resize(1);
+    coef[0][0].resize(1);
+    coef[0][0][0] = ComplexVal(3.0, 0);
+    ComplexVal tmp = coef[0][0][0];
+
+    coef[1][0][0] = (ComplexVal(3, 0));
+    coef[1][0][1] = (ComplexVal(-1, 0));
+    coef[1][0][2] = (ComplexVal(6, 0));
+    coef[1][0][3] = (ComplexVal(7, 0));
+    coef[1][1][0] = (ComplexVal(-2, 0));
+    coef[1][1][1] = (ComplexVal(8, 0));
+    coef[1][1][2] = (ComplexVal(-5, 0));
+    coef[1][1][3] = (ComplexVal(10, 0));
+    coef[1][2][0] = (ComplexVal(13, 0));
+    coef[1][2][1] = (ComplexVal(16, 0));
+    coef[1][2][2] = (ComplexVal(0, 0));
+    coef[1][2][3] = (ComplexVal(1, 0));
+    coef[1][3][0] = (ComplexVal(23, 0));
+    coef[1][3][1] = (ComplexVal(3, 0));
+    coef[1][3][2] = (ComplexVal(-7, 0));
+    coef[1][3][3] = (ComplexVal(5, 0));
+
+
+    for(int i = 0; i < 4; i++)
+    {
+        coef[2][i].fill(ComplexVal(0, 0));
+    }
+
+
+    coef[3] = coef[1];
+    coef[2][1].fill(ComplexVal(0, 0));
+
+
+    coef[4] = coef[1];
+    coef[4][2] = coef[4][1];
+
+
+    coef[5] = coef[1];
+    for(int i = 0; i < 4; i++)
+        coef[5][i][2] =coef[5][i][1];
+
+
+    coef[6] = coef[1];
+    for(int i = 0; i < 4; i++)
+        coef[6][3][i] =coef[6][2][i] * ComplexVal(10, 0);
+
+
+    coef[7] = coef[1];
+    for(int i = 0; i < 4; i++)
+        coef[7][i][3] =coef[7][i][1]*ComplexVal(10, 0);
+
+
+    coef[8] = coef[1];
+    coef[8][1][0] = coef[8][2][0] = coef[8][2][1] = \
+        coef[8][3][0] = coef[8][3][1] = coef[8][3][2] = ComplexVal(0, 0);
+    coef[8][2][2] = ComplexVal(9, 0);
+
+
+    coef[9] = coef[2];
+    for(int i = 0; i < 4; i++)
+        coef[9][i][i] = 1;
+
+
+    coef[10] = coef[1];
+
+
+    coef[11] = coef[1];
+    coef[11][1][0] = coef[11][0][1];
+    coef[11][2][0] = coef[11][0][2];
+    coef[11][2][1] = coef[11][0][3];
+    coef[11][3][0] = coef[11][1][2];
+    coef[11][3][1] = coef[11][1][3];
+    coef[11][3][3] = coef[11][2][3];
+
+
+    coef[12][0][0] = ComplexVal(3, 5);
+    coef[12][0][1] = ComplexVal(-1, -7);
+    coef[12][0][2] = ComplexVal(6, -0.01);
+    coef[12][0][3] = ComplexVal(7, -1.5);
+    coef[12][1][0] = ComplexVal(-2, 4);
+    coef[12][1][1] = ComplexVal(8, 8);
+    coef[12][1][2] = ComplexVal(-5, 5);
+    coef[12][1][3] = ComplexVal(10, 1);
+    coef[12][2][0] = ComplexVal(13, -1);
+    coef[12][2][1] = ComplexVal(16, 2);
+    coef[12][2][2] = ComplexVal(0, -7);
+    coef[12][2][3] = ComplexVal(1, -1);
+    coef[12][3][0] = ComplexVal(23, 11);
+    coef[12][3][1] = ComplexVal(3, 0.2);
+    coef[12][3][2] = ComplexVal(-7, 17);
+    coef[12][3][3] = ComplexVal(5, 5);
+
+
+    constnum[0].append(ComplexVal(9, 0));
+
+    constnum[1].append(ComplexVal(15, 0));
+    constnum[1].append(ComplexVal(13, 0));
+    constnum[1].append(ComplexVal(-14, 0));
+    constnum[1].append(ComplexVal(2, 0));
+
+    constnum[2] = constnum[3] = constnum[4] = constnum[5] = constnum[6]= \
+        constnum[7] = constnum[8] = constnum[9] = constnum[11] = constnum[1];
+
+    constnum[10].fill(ComplexVal(0, 0), 4);
+
+    constnum[12].append(ComplexVal(15, 0));
+    constnum[12].append(ComplexVal(13, -16));
+    constnum[12].append(ComplexVal(-14, 0));
+    constnum[12].append(ComplexVal(2, 13));
+
+
+
+    res[0].append(ComplexVal(3, 0));
+
+
+    res[1].append(ComplexVal(-0.1981, 0));
+    res[1].append(ComplexVal(-0.8388 , 0));
+    res[1].append(ComplexVal(0.13, 0));
+    res[1].append(ComplexVal(1.9965, 0));
+
+
+    res[8].append(ComplexVal(7.3083, 0));
+    res[8].append(ComplexVal(0.1250 , 0));
+    res[8].append(ComplexVal(-1.6000, 0));
+    res[8].append(ComplexVal(0.4, 0));
+
+
+    res[9].append(ComplexVal(15, 0));
+    res[9].append(ComplexVal(13, 0));
+    res[9].append(ComplexVal(-14, 0));
+    res[9].append(ComplexVal(2, 0));
+
+
+    res[10].append(ComplexVal(0, 0));
+    res[10].append(ComplexVal(0 , 0));
+    res[10].append(ComplexVal(0, 0));
+    res[10].append(ComplexVal(0, 0));
+
+
+    res[11].append(ComplexVal( -2.0181, 0));
+    res[11].append(ComplexVal( 0.6773  , 0));
+    res[11].append(ComplexVal( 1.8776, 0));
+    res[11].append(ComplexVal( 1.4951, 0));
+
+
+    res[12].append(ComplexVal(0.04, 0.59));
+    res[12].append(ComplexVal(-1.08 , -0.4));
+    res[12].append(ComplexVal(0.22, 0.08));
+    res[12].append(ComplexVal(2.44, 0.92));
+
+    QTest::newRow("Система состоит из одного уравнения с одной неизвестной переменной") << coef[0] << constnum[0] << res[0];
+    QTest::newRow("Система содержит несколько уравнений") << coef[1] << constnum[1] << res[1];
+    QTest::newRow("Матрица коэффициентов нулевая") << coef[2] << constnum[2] << res[2];
+    QTest::newRow("Матрица коэффициентов содержит нулевую строку") << coef[3] << constnum[3] << res[3];
+    QTest::newRow("Две строки матрицы коэффициентов равны") << coef[4] << constnum[4] << res[4];
+    QTest::newRow("Два столбца матрицы коэффициентов равны") << coef[5] << constnum[5] << res[5];
+    QTest::newRow("Две строки матрицы коэффициентов пропорциональны друг другу") << coef[6] << constnum[6] << res[6];
+    QTest::newRow("Два столбца матрицы коэффициентов пропорциональны друг другу") << coef[7] << constnum[7] << res[7];
+    QTest::newRow("Матрица коэффициентов имеет треугольный вид") << coef[8] << constnum[8] << res[8];
+    QTest::newRow("Матрица коэффициентов единичная") << coef[9] << constnum[9] << res[9];
+    QTest::newRow("Матрицастолбец нулевая") << coef[10] << constnum[10] << res[10];
+    QTest::newRow("Элементы матрицы коэффициентов равны относительно главной диагонали") << coef[11] << constnum[11] << res[11];
+    QTest::newRow("Числа – комплексные (мнимая часть отлична от нуля)") << coef[12] << constnum[12] << res[12];
+}
+
+
+
+
 
 #include "tst_apptest.moc"
 
