@@ -1283,6 +1283,452 @@ void AppTest::test_solveEquations_data()
 
 
 
+void AppTest::test_findIndependentContours()
+{
+    contourList c;
+
+    QFETCH(Graph, graph);
+    QFETCH(branchList, branches);
+    QFETCH(contourList, contours);
+
+    findIndependentContours(graph, branches, c);
+    for(int i =0; i < c.count() && c.count()==contours.count(); i++)
+    {
+        QMapIterator<int, int> j1(c[i]);
+        QMapIterator<int, int> j2(contours[i]);
+    }
+    QVERIFY2(compareVects(c, contours), "Result checking failed");
+}
+
+void AppTest::test_findIndependentContours_data()
+{
+    QTest::addColumn<Graph>("graph");
+    QTest::addColumn<branchList>("branches");
+    QTest::addColumn<contourList>("contours");
+
+    Graph g;
+    branchList branches;
+    contourList contours;
+    QMap<int, int> contour;
+    Branch b;
+
+
+    g.insertEdge("b", 1, "a");
+    g.insertEdge("a", 2, "b");
+    g.insertEdge("b", 3, "a");
+    g.insertEdge("a", 4, "b");
+
+    b.setNodes("b", "a");
+    branches.insert(1, b);
+    b.setNodes("a", "b");
+    branches.insert(2, b);
+    b.setNodes("b", "a");
+    branches.insert(3, b);
+    b.setNodes("a", "b");
+    branches.insert(4, b);
+
+    contour.insert(1, 1);
+    contour.insert(2, 1);
+    contours.append(contour);
+    contour.clear();
+    contour.insert(1, -1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+    contour.insert(1, 1);
+    contour.insert(4, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Проводники соединены параллельно") << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("", 1, "");
+
+    b.setNodes("", "");
+    branches.insert(1, b);
+
+    contour.insert(1, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Все элементы соединены последовательно") << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("b", 1, "a");
+    g.insertEdge("a", 2, "d");
+    g.insertEdge("a", 3, "d");
+    g.insertEdge("b", 4, "d");
+    g.insertEdge("b", 5, "c");
+    g.insertEdge("c", 6, "d");
+
+    b.setNodes("b", "a");
+    branches.insert(1, b);
+    b.setNodes("a", "d");
+    branches.insert(2, b);
+    b.setNodes("a", "d");
+    branches.insert(3, b);
+    b.setNodes("b", "d");
+    branches.insert(4, b);
+    b.setNodes("b", "c");
+    branches.insert(5, b);
+    b.setNodes("c", "d");
+    branches.insert(6, b);
+
+    contour.insert(2, -1);
+    contour.insert(3, 1);
+    contours.append(contour);
+
+    contour.clear();
+    contour.insert(1, -1);
+    contour.insert(2, -1);
+    contour.insert(4, 1);
+    contours.append(contour);
+
+    contour.clear();
+    contour.insert(1, -1);
+    contour.insert(2, -1);
+    contour.insert(5, 1);
+    contour.insert(6, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Граф, описывающий цепь, содержит кратные ребра")
+        << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("a", 1, "b");
+    g.insertEdge("a", 2, "c");
+    g.insertEdge("a", 3, "d");
+    g.insertEdge("b", 4, "h");
+    g.insertEdge("b", 5, "g");
+    g.insertEdge("c", 6, "f");
+    g.insertEdge("c", 7, "e");
+    g.insertEdge("d", 8, "e");
+    g.insertEdge("d", 9, "f");
+    g.insertEdge("e", 10, "g");
+    g.insertEdge("g", 11, "f");
+    g.insertEdge("g", 12, "h");
+    g.insertEdge("g", 13, "d");
+    g.insertEdge("e", 14, "h");
+    g.insertEdge("d", 15, "c");
+    g.insertEdge("h", 16, "d");
+
+    b.setNodes("a", "b");
+    branches.insert(1, b);
+    b.setNodes("a", "c");
+    branches.insert(2, b);
+    b.setNodes("a", "d");
+    branches.insert(3, b);
+    b.setNodes("b", "h");
+    branches.insert(4, b);
+    b.setNodes("b", "g");
+    branches.insert(5, b);
+    b.setNodes("c", "f");
+    branches.insert(6, b);
+    b.setNodes("c", "e");
+    branches.insert(7, b);
+    b.setNodes("d", "e");
+    branches.insert(8, b);
+    b.setNodes("d", "f");
+    branches.insert(9, b);
+    b.setNodes("e", "g");
+    branches.insert(10, b);
+    b.setNodes("g", "f");
+    branches.insert(11, b);
+    b.setNodes("g", "h");
+    branches.insert(12, b);
+    b.setNodes("g", "d");
+    branches.insert(13, b);
+    b.setNodes("e", "h");
+    branches.insert(14, b);
+    b.setNodes("d", "c");
+    branches.insert(15, b);
+    b.setNodes("h", "d");
+    branches.insert(16, b);
+
+    contour.insert(2, -1);
+    contour.insert(7, -1);
+    contour.insert(8, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(2, -1);
+    contour.insert(3, 1);
+    contour.insert(9, 1);
+    contour.insert(6, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, -1);
+    contour.insert(2, 1);
+    contour.insert(7, 1);
+    contour.insert(10, 1);
+    contour.insert(5, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, 1);
+    contour.insert(5, 1);
+    contour.insert(11, 1);
+    contour.insert(6, -1);
+    contour.insert(2, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(4, -1);
+    contour.insert(5, 1);
+    contour.insert(12, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, 1);
+    contour.insert(5, 1);
+    contour.insert(13, 1);
+    contour.insert(3, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, -1);
+    contour.insert(2, 1);
+    contour.insert(7, 1);
+    contour.insert(14, 1);
+    contour.insert(4, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(2, -1);
+    contour.insert(3, 1);
+    contour.insert(15, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, 1);
+    contour.insert(4, 1);
+    contour.insert(16, 1);
+    contour.insert(3, -1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Большое количество контуров")
+        << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("b", 1, "a");
+    g.insertEdge("a", 2, "d");
+    g.insertEdge("a", 3, "d");
+    g.insertEdge("b", 4, "d");
+    g.insertEdge("b", 5, "c");
+    g.insertEdge("c", 6, "d");
+    g.insertEdge("c", 7, "c");
+
+    b.setNodes("b", "a");
+    branches.insert(1, b);
+    b.setNodes("a", "d");
+    branches.insert(2, b);
+    b.setNodes("a", "d");
+    branches.insert(3, b);
+    b.setNodes("b", "d");
+    branches.insert(4, b);
+    b.setNodes("b", "c");
+    branches.insert(5, b);
+    b.setNodes("c", "d");
+    branches.insert(6, b);
+    b.setNodes("c", "c");
+    branches.insert(7, b);
+
+    contour.insert(2, -1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, -1);
+    contour.insert(4, 1);
+    contour.insert(2, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, -1);
+    contour.insert(2, -1);
+    contour.insert(6, 1);
+    contour.insert(5, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(7, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Граф, описывающий цепь, содержит кратные ребра и петли")
+        << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("a", 1, "b");
+    g.insertEdge("a", 2, "c");
+    g.insertEdge("d", 3, "a");
+    g.insertEdge("b", 4, "c");
+    g.insertEdge("b", 5, "d");
+    g.insertEdge("c", 6, "d");
+
+    b.setNodes("a", "b");
+    branches.insert(1, b);
+    b.setNodes("a", "c");
+    branches.insert(2, b);
+    b.setNodes("d", "a");
+    branches.insert(3, b);
+    b.setNodes("b", "c");
+    branches.insert(4, b);
+    b.setNodes("b", "d");
+    branches.insert(5, b);
+    b.setNodes("c", "d");
+    branches.insert(6, b);
+
+
+    contour.insert(1, 1);
+    contour.insert(5, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, 1);
+    contour.insert(4, 1);
+    contour.insert(2, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(2, 1);
+    contour.insert(6, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Граф, описывающий цепь, является полным") << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("a", 1, "b");
+    g.insertEdge("a", 2, "c");
+    g.insertEdge("d", 3, "a");
+    g.insertEdge("c", 4, "d");
+    g.insertEdge("b", 5, "d");
+
+    b.setNodes("a", "b");
+    branches.insert(1, b);
+    b.setNodes("a", "c");
+    branches.insert(2, b);
+    b.setNodes("d", "a");
+    branches.insert(3, b);
+    b.setNodes("c", "d");
+    branches.insert(4, b);
+    b.setNodes("b", "d");
+    branches.insert(5, b);
+
+
+    contour.insert(1, 1);
+    contour.insert(5, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(2, 1);
+    contour.insert(4, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Граф простой") << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+
+    g.insertEdge("a", 1, "b");
+    g.insertEdge("a", 2, "c");
+    g.insertEdge("d", 3, "a");
+    g.insertEdge("b", 4, "c");
+    g.insertEdge("b", 5, "d");
+    g.insertEdge("c", 6, "d");
+    g.insertEdge("a", 7, "b");
+    g.insertEdge("c", 8, "c");
+
+    b.setNodes("a", "b");
+    branches.insert(1, b);
+    b.setNodes("a", "c");
+    branches.insert(2, b);
+    b.setNodes("d", "a");
+    branches.insert(3, b);
+    b.setNodes("b", "c");
+    branches.insert(4, b);
+    b.setNodes("b", "d");
+    branches.insert(5, b);
+    b.setNodes("c", "d");
+    branches.insert(6, b);
+    b.setNodes("a", "b");
+    branches.insert(7, b);
+    b.setNodes("c", "c");
+    branches.insert(8, b);
+
+    contour.insert(1, 1);
+    contour.insert(4, 1);
+    contour.insert(2, -1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, 1);
+    contour.insert(5, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(2, 1);
+    contour.insert(6, 1);
+    contour.insert(3, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(1, -1);
+    contour.insert(7, 1);
+    contours.append(contour);
+    contour.clear();
+
+    contour.insert(8, 1);
+    contours.append(contour);
+    contour.clear();
+
+    QTest::newRow("Полный граф с кратными ребрами и петлями") << g << branches << contours;
+
+    g.clear();
+    branches.clear();
+    contours.clear();
+
+}
+
+
 
 
 #include "tst_apptest.moc"
