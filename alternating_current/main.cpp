@@ -270,3 +270,19 @@ int makingBranch(TiXmlElement * xmlnode, Branch & branch, int * number,int * id_
     }
     return count;
 }
+
+
+
+void makingElement(const TiXmlElement * givenel, Element & element,  TypeElement type,
+    char * namerus, char * nomeng, char * nomrus)
+{
+    QTextCodec * c = QTextCodec::codecForLocale();
+    element.type = type;
+    const char * value = givenel->Attribute(nomeng);
+    element.value = QString(c->toUnicode(value)).toDouble();
+    if(element.value < 0.0000001 || element.value > 10000000)
+    {
+        QString mes =  QString(namerus) + "(" + QString::number(element.value, 'f') + " " + QString(nomrus) + ")";
+        throw mes;
+    }
+}
