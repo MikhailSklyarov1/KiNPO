@@ -87,3 +87,57 @@ int main(int argc, char *argv[])
     #endif
     return 0;
 }
+
+
+void parseFileXML(char * filename, QMap<int, Branch> & branches, Graph & graph)
+{
+    if(QString(filename).right(4) != QString(".xml"))
+        throw QString("Неверный формат файла");
+    TiXmlDocument doc(filename);
+    if(!doc.LoadFile())
+        throw QString("Неверный формат файла");
+    Branch b;
+    int number = 0;
+    int count = 0;
+    int id_num = 1;
+    TiXmlElement* chain = doc.FirstChildElement( "chain" );
+    if ( chain )
+    {
+        TiXmlElement* branch = chain->FirstChildElement( "branch" );
+        try
+        {
+            //Для каждой ветви...
+            while(branch)
+            {
+                //Сформировать ветвь и произвести их подсчет
+                count += makingBranch(branch, b, &number, &id_num);
+                id_num++;  //Инкрементировать id
+                branches.insert(number, b);
+                graph.insertEdge(b.getStart(), number, b.getEnd());
+                branch = branch->NextSiblingElement( "branch" );
+            }
+
+            if(count < 2 || count > 40)
+            {
+                throw QString("Некорректное количество элементов. Оно должно быть в диапазоне от 2 до 40 элементов.");
+            }
+        }
+
+        catch (QString str)
+        {
+                throw str;
+        }
+
+        //Проверка на односвязность графа
+        if(!graph.isSimpleConnected())
+            throw QString("В цепи присутствует разрыв, поэтому ток не может пройти через все ветви.");
+
+        QVector<QString> list;
+        graph.findLeafNode(list);
+
+        if(!list.isEmpty())
+        {
+            throw QString ("Из каждого узла должны выходить хотя бы две ветви.");
+        }
+    }
+}
