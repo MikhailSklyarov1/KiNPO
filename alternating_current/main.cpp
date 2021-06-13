@@ -286,3 +286,54 @@ void makingElement(const TiXmlElement * givenel, Element & element,  TypeElement
         throw mes;
     }
 }
+
+
+void findIndependentContours(Graph & graph, QMap<int, Branch> & branches, QVector<QMap<int, int>> & contours)
+{
+    Graph tree;
+    int edgeNum;
+    Branch current;
+
+    //Выделить остовное дерево графа
+    QVector<int> links;
+    graph.getSkeletalTree(tree, links);
+
+    //Для каждой хорды (s, v) графа
+    QVectorIterator<int> link(links);
+    while(link.hasNext())
+    {
+        edgeNum = link.next();
+        current = branches.value(edgeNum);
+        QString v = current.getStart();
+        int b;
+        QVector<int> path;
+        QMap<int, int> contour;
+
+        //Найти путь от узла s до узла v
+        if(tree.findPath(current.getEnd(), v, path))
+        {
+            //Добавить ветвь (s, v) в начало найденного пути
+            path.prepend(edgeNum);
+
+            //Добавить найденный путь в список контуров
+
+            //..Для каждой ветви, входящей в список пути
+            for(int i = 0; i < path.count(); i++)
+            {
+                b = path[i];
+                //Если направление тока совпадает с направлением контурного тока
+                current = branches.value(path[i]);	//Берем ветвь из списка вевтей с номером хорды
+                if(v == current.getStart())
+                {
+                    contour.insert(path[i], 1); //Присвоить единицу
+                    v = current.getEnd();
+                }
+                else
+                {
+                    contour.insert(path[i], -1); //Присвоить минус один
+                    v = current.getStart();
+                }
+            }
+            contours.append(contour);
+        }
+    }
