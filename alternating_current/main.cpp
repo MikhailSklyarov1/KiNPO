@@ -351,3 +351,77 @@ void cyclicCurrentsCalculation(QVector<QMap<int, int>> & contours, QMap<int, Bra
     //Решить систему уравнений
     solveEquations(multnum, constnum, currents);
 }
+
+
+void compilationEquations(QVector<QVector<ComplexVal>> & resistance, QVector<ComplexVal> & voltage,QMap<int, Branch> & branches, QVector<QMap<int, int>> & contours)
+{
+    Branch tmp;
+    resistance.resize(contours.count());
+    for(int i = 0; i < contours.count(); i++)
+        resistance[i].resize(contours.count());
+
+    voltage.resize(contours.count());
+
+    //Для каждого элемента матрицы коэффициентов и матрицы свободных членов
+    for(int i = 0; i < contours.count(); i++)
+    {
+        for(int j = i; j < contours.count(); j++)
+        {
+            resistance[i][j] = ComplexVal(0, 0);
+
+            //Заполнить i-ю строку матрицы коэффициентов.
+            if(i == j)	//Элемент матрицы находится на главной диагонали...
+            {
+                //..Элемент равен сумме сопротивлений в ветвях, через которые протекает i-й контурный
+                QMapIterator<int, int> contour(contours[i]);
+                while(contour.hasNext())
+                {
+                    tmp = branches.value(contour.next().key());
+                    resistance[i][j]+=tmp.getComplexResistance();
+                }
+            }
+
+
+            bool hasIncidentBranches = false;
+            QMapIterator<int, int> k(contours[i]);
+            while(k.hasNext())
+                if(contours[j].contains(k.next().key()))
+                {
+                    hasIncidentBranches = true;
+                }
+
+            else if(!hasIncidentBranches) //Иначе если контур i не имеет смежных ветвей с контуром j
+            {
+                resistance[i][j] = resistance[j][i] = 0;
+            }
+            else
+            {
+                QVector<int> br;
+
+
+               QMapIterator<int, int> q(contours[i]);
+                while(q.hasNext())
+                {
+                    if(contours[j].contains(q.next().key()))
+                    {
+                        br.append(q.key());
+                    }
+                }
+
+                for(int k = 0; k < br.count(); k++)
+                {
+                    tmp = branches.value(br[k]);
+                    resistance[i][j] = resistance[j][i] += tmp.getComplexResistance() *	ComplexVal(contours[i].key(br[k]), 0) * ComplexVal(contours[j].key(br[k]), 0);
+                }
+            }
+        }
+
+        //Заполнить i-ый элемент матрицы свободных членов
+        QMapIterator<int, int> contour(contours[i]);
+        while(contour.hasNext())
+        {
+            tmp = branches.value(contour.next().key());
+            voltage[i]+=tmp.getVoltage()* ComplexVal(contour.value(), 0);
+        }
+    }
+}
