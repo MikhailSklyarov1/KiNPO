@@ -337,3 +337,17 @@ void findIndependentContours(Graph & graph, QMap<int, Branch> & branches, QVecto
             contours.append(contour);
         }
     }
+}
+
+
+void cyclicCurrentsCalculation(QVector<QMap<int, int>> & contours, QMap<int, Branch> & branches, QVector<ComplexVal> & currents)
+{
+    QVector<QVector<ComplexVal>> multnum;
+    QVector<ComplexVal> constnum;
+
+    //Составить уравнения по второму законам Кирхгофа
+    compilationEquations(multnum, constnum, branches, contours);
+
+    //Решить систему уравнений
+    solveEquations(multnum, constnum, currents);
+}
