@@ -425,3 +425,28 @@ void compilationEquations(QVector<QVector<ComplexVal>> & resistance, QVector<Com
         }
     }
 }
+
+
+void solveEquations(QVector<QVector<ComplexVal>> & multnum, QVector<ComplexVal> & constnum, QVector<ComplexVal> & variables)
+{
+    QVector<QVector<ComplexVal>> tmp;
+
+    //Рассчитать определитель матрицы коэффициентов
+    ComplexVal det = determinantOfMatrix(multnum);
+    if(det == ComplexVal(0, 0))
+        return;
+    int count = multnum.count();
+
+    //Для каждого i-го столбца матрицы коэффициентов
+    for(int i = 0; i < count; i++)
+    {
+        tmp = multnum;
+
+        //Заменить i-й столбец матрицы коэффициентов матрицей-столбцом
+        for(int j = 0; j < count; j++)
+            tmp[j][i] = constnum[j];
+
+        //Добавить в конец вектора с неизвестными переменными отношение определителей
+        variables.append(determinantOfMatrix(tmp)/det);
+    }
+}
