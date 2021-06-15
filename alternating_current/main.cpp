@@ -450,3 +450,27 @@ void solveEquations(QVector<QVector<ComplexVal>> & multnum, QVector<ComplexVal> 
         variables.append(determinantOfMatrix(tmp)/det);
     }
 }
+
+
+
+ComplexVal additionMatrix(const QVector<QVector<ComplexVal>> & matrix, int row, int column)
+{
+    QVector<QVector<ComplexVal>> add(matrix.count()-1);
+    for(int i = 0; i < matrix.count()-1; i++)
+        add[i].resize(matrix.count()-1);
+
+    for(int i = 0; i <  matrix.count(); i++)
+        for(int j = 0; j <  matrix.count(); j++)
+        {
+            if(i < row && j < column)
+                add[i][j] = matrix[i][j];
+            else if(i > row && j < column)
+                add[i-1][j] = matrix[i][j];
+            else if(i < row && j > column)
+                add[i][j-1] = matrix[i][j];
+            else if(i > row && j > column)
+                add[i-1][j-1] = matrix[i][j];
+        }
+    return determinantOfMatrix(add);
+}
+
