@@ -463,13 +463,21 @@ ComplexVal additionMatrix(const QVector<QVector<ComplexVal>> & matrix, int row, 
         for(int j = 0; j <  matrix.count(); j++)
         {
             if(i < row && j < column)
+            {
                 add[i][j] = matrix[i][j];
+            }
             else if(i > row && j < column)
+            {
                 add[i-1][j] = matrix[i][j];
+            }
             else if(i < row && j > column)
+            {
                 add[i][j-1] = matrix[i][j];
+            }
             else if(i > row && j > column)
+            {
                 add[i-1][j-1] = matrix[i][j];
+            }
         }
     return determinantOfMatrix(add);
 }
