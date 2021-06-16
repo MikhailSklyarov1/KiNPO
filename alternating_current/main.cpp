@@ -482,3 +482,41 @@ ComplexVal additionMatrix(const QVector<QVector<ComplexVal>> & matrix, int row, 
     return determinantOfMatrix(add);
 }
 
+
+
+ComplexVal determinantOfMatrix(const QVector<QVector<ComplexVal>> & matrix)
+{
+    ComplexVal det = ComplexVal(0, 0);
+
+    //Если матрица первого порядка
+    if(matrix.count()==1)
+    {
+        return matrix[0][0];
+    }
+
+    //Если матрица второго порядка:
+    else if(matrix.count()==2)
+    {
+        det += matrix[0][0] * matrix[1][1];
+        det -= matrix[0][1] * matrix[1][0];
+        return det;
+    }
+    else if(matrix.count() > 2)	//Иначе для каждого элемента первой строки...
+    {
+        for(int i = 0; i < matrix[0].count(); i++)
+        {
+            //Прибавить к определителю произведение элемента matrix[0][i] на его дополнение
+            if(i%2)
+            {
+                det += matrix[0][i] * additionMatrix(matrix, 0, i);
+            }
+            else
+            {
+                det -= matrix[0][i] * additionMatrix(matrix, 0, i);
+            }
+        }
+    }
+
+    //Вернуть определитель
+    return det;
+}
