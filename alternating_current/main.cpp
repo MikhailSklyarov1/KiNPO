@@ -508,11 +508,11 @@ ComplexVal determinantOfMatrix(const QVector<QVector<ComplexVal>> & matrix)
             //Прибавить к определителю произведение элемента matrix[0][i] на его дополнение
             if(i%2)
             {
-                det += matrix[0][i] * additionMatrix(matrix, 0, i);
+                det -= matrix[0][i] * additionMatrix(matrix, 0, i);
             }
             else
             {
-                det -= matrix[0][i] * additionMatrix(matrix, 0, i);
+                det += matrix[0][i] * additionMatrix(matrix, 0, i);
             }
         }
     }
