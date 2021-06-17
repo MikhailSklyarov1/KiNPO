@@ -520,3 +520,30 @@ ComplexVal determinantOfMatrix(const QVector<QVector<ComplexVal>> & matrix)
     //Вернуть определитель
     return det;
 }
+
+
+void currentCalculation(QVector<QMap<int, int>> & contours, QVector<ComplexVal> & currents, QMap<int, Branch> & branches)
+{
+    QMutableMapIterator<int, Branch> it(branches);
+    double res;
+
+    //Для каждой ветви
+    while(it.hasNext())
+    {
+        ComplexVal curr(0, 0);
+        int number = it.next().key();
+
+        //Для каждого элемента ветви
+        for(int i = 0; i < currents.count(); i++)
+        {
+            if(contours[i].contains(number))
+            {
+                //Найти суммарное значение
+                curr += ComplexVal(contours[i].value(number), 0) * currents[i];
+            }
+        }
+        //Привести к действительной форме
+        res = abs(curr)/sqrt(2.0);
+        it.value().setCurrent(res);
+    }
+}
