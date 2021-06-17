@@ -547,3 +547,24 @@ void currentCalculation(QVector<QMap<int, int>> & contours, QVector<ComplexVal> 
         it.value().setCurrent(res);
     }
 }
+
+
+void writeResult(char * direct, const QMap<int, Branch> & branches)
+{
+    QTextCodec * c = QTextCodec::codecForLocale();
+    QFile file(c->toUnicode(direct));
+    if(file.open(QIODevice::WriteOnly))
+    {
+        QTextStream out(&file);
+        out << QString("digraph name {\n");
+        QMapIterator<int, Branch> i(branches);
+        while(i.hasNext())
+        {
+            out << i.next().value().getStart();
+            out << QString("->") << i.value().getEnd() << QString("[label=\"I");
+            out << QString::number(i.key());
+            out	<< QString("=") << QString::number(i.value().getCurrent(), 'f') << QString(" A\"];\n");
+        }
+        out << QString("}");
+    }
+}
