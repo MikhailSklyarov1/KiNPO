@@ -9,6 +9,8 @@ int main(int argc, char *argv[])
 #else
     //Основные действия программы
     int res = sum(1, 2);
+    //Основная вычислительная часть
+
 #endif
 
     return 0;
