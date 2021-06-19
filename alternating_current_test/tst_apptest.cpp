@@ -15,6 +15,7 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void test_case1();
+    void test_case2();
 
 };
 
@@ -41,6 +42,11 @@ void AppTest::cleanupTestCase()
 void AppTest::test_case1()
 {
     QVERIFY(sum(1, 3) == 4);
+}
+
+void AppTest::test_case2()
+{
+    QVERIFY(sum(2, 3) == 5);
 }
 
 #include "tst_apptest.moc"

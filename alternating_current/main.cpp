@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <functions.h>
+#include "../../tinyxml/tinyxml.h"
 
 int main(int argc, char *argv[])
 {

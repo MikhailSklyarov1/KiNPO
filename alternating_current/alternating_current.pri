@@ -13,9 +13,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 SOURCES += \
+    $$PWD/../../tinyxml/tinystr.cpp \
+    $$PWD/../../tinyxml/tinyxml.cpp \
+    $$PWD/../../tinyxml/tinyxmlerror.cpp \
+    $$PWD/../../tinyxml/tinyxmlparser.cpp \
     $$PWD/functions.cpp
 
 HEADERS += \
+    $$PWD/../../tinyxml/tinystr.h \
+    $$PWD/../../tinyxml/tinyxml.h \
     $$PWD/functions.h
 
 INCLUDEPATH = \
